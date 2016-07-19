@@ -1,0 +1,70 @@
+\chapter{راهکار پیشنهادی برای تقطیع تصاویر}
+\label{ch:proposedMethod}
+با اتخاذ این فرض که بردارهای ویژگی استخراج شده از تصویر، دارای توزیع آمیخته
+\lr{von Mises-Fisher}
+هستند، مسئله تقطیع تصویر، به یک مسئله خوشه‌بندی این داده‌ها تبدیل می‌شود.
+این خوشه‌بندی بر اساس تئوری اطلاعات و با معیار کاهش
+{\mmm{افزونگی}{redundancy}}
+به گونه‌ای انجام می‌شود که طول کد لازم برای توصیف کلیه قطعات تصویر، کمینه باشد.
+با توجه به اندازه بسیار بزرگ داده‌های مربوط به کل تصویر، ابتدا تصویر را با استفاده از یک الگوریتم تقطیع سطح پایین به تعداد زیادی قطعات کوچک همگن تقسیم می‌کنیم که به آن‌ها
+{\mmm{ابرپیکسل}{superpixel}}
+می‌گوییم.
+سپس با آغاز از این ابرپیکسل‌ها و ادغام پی‌درپی نواحی مجاور با معیار کاهش افزونگی
+مبتنی بر درست‌نمایی مدل آمیخته برازش شده بر قطعات، تقطیع نهایی بر اساس بافت‌های تصویر بدست می‌آید.
+
+به منظور بهبود کارایی در راهکار پیشنهادی، از الگوریتم مقداردهی اولیه\section{شبه‌کد}
+فرآیند کامل تقطیع با روش پیشنهادی به صورت شبه‌کد در الگوریتم%
+~\ref{alg.full_algorithm}
+آمده است.
+
+\begin{algorithm}[htb]
+	\caption{\small فرآیند کامل تقطیع پیشنهاد شده}
+	\label{alg.full_algorithm}
+	\begin{algorithmic}
+		\begin{latin}
+\STATE \textbf{Input:} Image $I$ of height $H$ and width $W$, window size $w$, model component count $K$, model coding-length multiplier $\lambda$.
+
+\STATE Partition $I$ into superpixels $\mathcal{X}_1,\dots,\mathcal{X}_Q$. For pixel $p_i \in \mathcal{X}_j$ initialize its label $l_i=j$.
+
+\STATE Construct a region-adjacency graph $G\{1\},\dots,G\{Q\}$ for the $Q$ segments $\mathcal{X}_1,\dots,\mathcal{X}_Q$.
+
+\STATE Sample $w \times w$ windows for each pixel, and construct feature vectors.
+
+\FORALL {initial segments $\mathcal{X}_i, i=1,\dots,Q$}
+
+\STATE Estimate the parameters, $\theta_i$, of a mixture of $K$ von-Mises Fisher distributions fitting $\mathcal{X}_i$.
+
+\STATE Compute the coding length for the $i$th segment, $L(\theta_i,\mathcal{X}_i)$.
+
+\FORALL {$j \in G\{i\}$}
+
+	\STATE Estimate the parameters, $\theta_{ij}$, of a mixture of $K$ von-Mises Fisher distributions fitting $\mathcal{X}_i \cup \mathcal{X}_j$.
+	
+	\STATE $U_{ij} \gets L(\theta_i,\mathcal{X}_i) + L(\theta_j,\mathcal{X}_j) - L(\theta_{ij},\mathcal{X}_i \cup \mathcal{X}_j)$.
+
+\ENDFOR
+
+\WHILE {$U_{ij} \gets \max \{U\} > 0$}
+
+	\STATE Merge $\mathcal{X}_i$ and $\mathcal{X}_j$. Update arrays $l$, $G$, $L$ and $U$.
+	
+	\STATE $Q \gets Q-1$.
+
+\ENDWHILE
+
+\ENDFOR
+
+\STATE \textbf{Output:} Final pixel labels $l_1,\dots,l_{H \times W}$.
+
+		\end{latin}
+	\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+
+
+
+

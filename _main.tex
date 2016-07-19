@@ -1,0 +1,118 @@
+% arara: xelatex: { shell: yes, action: nonstopmode }
+% arara: makeglossaries
+% arara: xelatex: { shell: yes, synctex: true, action: nonstopmode }
+% arara: xelatex: { shell: yes, synctex: true, action: nonstopmode }
+
+% How to use Arara for compiling in TeXstudio: (Arara doesn't support xindy)
+% Options -> Configure TeXstudio -> Build
+% Add a User Command: "user0:Arara" with command: "arara -v -l %.tex" (without the quotes)
+% In the Meta Commands (above), change the Default Compiler to "txs:///user0"
+
+% You also need to install Perl to compile glossaries (e.g. "Strawberry Perl" for Windows)
+% Xindy in TexLive2014 has a bug in windows that gives error 255. You should update it before compiling: "tlmgr update xindy"
+
+% Xindy commands for compiling the glossaries: (add as a user command and set as default glossary tool)
+% xindy -L persian-variant1 -C utf8 -I xindy -M %.xdy -t %.glg -o %.gls %.glo | xindy -L persian-variant1 -C utf8 -I xindy -M %.xdy -t %.blg -o %.bls %.blo
+
+% see here for complete tutorial on glossaries:
+% http://www.parsilatex.com/mediawiki/index.php?title=%D8%B1%D8%A7%D9%87%D9%86%D9%85%D8%A7%DB%8C_%D8%A7%DB%8C%D8%AC%D8%A7%D8%AF_%D9%88%D8%A7%DA%98%D9%87%E2%80%8C%D9%86%D8%A7%D9%85%D9%87
+
+% Note: bib file should be BibTeX not BibLaTeX!
+
+
+\documentclass{My-Thesis}
+\input{math_header.tex}
+\newcommand{\mmm}[2]{\inpdic{#1}{#2}} % for Fa/En glossaries
+\newcommand{\mmmm}[2]{\lr{#1}\LTRfootnote{#2}} % for acronyms
+
+% to go to a left-sided page
+\newcommand*\cleartoleftpage{%
+	\clearpage
+	\ifodd\value{page}\thispagestyle{empty}\null\newpage\fi
+}
+
+
+% literal constants
+\gdef\titleFa{تقطیع تصاویر با استفاده از کاهش افزونگی}
+\gdef\titleEn{Image Segmentation Using Redundancy Reduction}
+\gdef\authorFa{محمدرضا مشعل}
+\gdef\authorEn{Mohamadreza Mash'al}
+\gdef\supervisorFa{دکتر رشاد حسینی}
+\gdef\supervisorEn{Dr. Reshad Hosseini}
+\gdef\advisorFa{دکتر مریم‌السادات میریان}
+\gdef\advisorEn{Dr. Maryam S. Mirian}
+\gdef\dateFa{دی 1394}
+\gdef\dateEn{January, 2016}
+\gdef\degreeFa{کارشناسی ارشد}
+\gdef\degreeEn{Master of Science}
+\gdef\majorFa{مهندسی کامپیوتر، گرایش هوش ماشین و رباتیک}
+\gdef\majorEn{Computer Engineering - AI and Robotics}
+
+% for sign page
+\gdef\tarikhDefa{\hspace{8mm}/\hspace{8mm}/\hspace{8mm}}
+\gdef\moavenTTpardis{دکتر راشد محصل}
+\gdef\departmentDean{دکتر فرهنگی}
+\gdef\moavenTTdepartment{دکتر ستاره‌دان}
+\gdef\davarI{دکتر کبیر}
+\gdef\davarII{}
+
+
+\begin{document}
+\textwidthfootnoterule % full footnote separator
+\pagenumbering{gobble} % Remove page numbers (and reset to 1)
+
+
+\include{besm}
+\include{cover_fa}
+%\include{sign}
+\include{taahod}
+\include{dedication}
+\include{acknowledge}
+\include{abstract_fa}
+
+
+\frontmatter % The pages after this command and before the command \mainmatter, will be numbered with lowercase Roman numerals.
+\pagestyle{mystyle} % change page style (show the page header)
+
+% fehrest ha
+\baselineskip=.90cm % line spacing
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+
+
+\mainmatter % This will restart the page counter and change the style to Arabic numbers.
+\baselineskip=1cm % line spacing
+
+\cleardoublepage
+\include{chap1}
+\include{chap2}
+\include{chap3}
+\include{chap4}
+\include{chap5}
+\include{chap6}
+\include{chap7}
+\include{chap8}
+
+\cleardoublepage
+\bibliography{Dissertation}
+
+% glossaries
+\settextfont[Scale=1]{XB Niloofar}
+\setlatintextfont[Scale=1]{Times New Roman}
+\baselineskip=.75cm
+\twocolumn{}
+\RTLdblcol
+\printglossary[type=FaToEn,style=mylistFa]
+\clearpage
+\LTRdblcol % note: this should come after a clearpage
+\printglossary[type=EnToFa,style=mylistEn]
+\onecolumn{}
+\defaultfonts
+
+% english pages
+\include{abstract_en}
+\include{cover_en}
+
+\end{document}
